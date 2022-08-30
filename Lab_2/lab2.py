@@ -1,3 +1,4 @@
+from random import randrange
 import numpy as np
 import math
 
@@ -19,7 +20,7 @@ def division(a,b):                  #returns a/b complex
 def sum_cn(a,b):                    #returns sum of two numbers
     return (a[0]+a[1],b[0]+b[1])
 
-def diff_cn(a,b):                    #returns sum of two numbers
+def diff_cn(a,b):                   #returns sum of two numbers
     return (a[0]-a[1],b[0]-b[1])
 
 
@@ -56,6 +57,8 @@ def Q_calculator(i):
     
     Power_3.append((Power_3[-1][0],-temp[1]))
 
+def line_loss(i,j):
+    return multiplication(conjugate(ad_mat[i][j]),multiplication(Voltages_iterations[i][-1],diff_cn(conjugate(Voltages_iterations[i][-1]),conjugate(Voltages_iterations[j][-1]))))
 
 # Parsing Transmission Line Data
 TL_Data = open("rx.csv")
@@ -114,7 +117,7 @@ Voltages_iterations = [[(1.05,0)],
 Power_2 = [(4,2)]
 Power_3 = [(2,-1)]
 
-#iterations = 10
+iterations = 0
 
 condition = True
 tolerance = 1e-4
@@ -143,9 +146,23 @@ while condition:
             new_value = (Voltages_iterations[j][0][0]*math.cos(angle),Voltages_iterations[j][0][0]*math.sin(angle))
 
             Voltages_iterations[j].append(new_value)
-        
+    
+    iterations -= -1
+
     if abs(rect_to_polar(Voltages_iterations[1][-1])[0] - rect_to_polar(Voltages_iterations[1][-2])[0])<=tolerance:
         condition=False
+
+print()
+
+for i in range(3):
+    for j in range(3):
+        if i>j:
+            print("The line loss of line",i,j,"is", line_loss(i,j))
+
+
+print()
+
+print("The model converged after",iterations,"iterations.")
 
 print()
 
